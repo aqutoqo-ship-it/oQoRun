@@ -4,7 +4,7 @@
  * 使用方法：
  *   <script src="../shared/ads.js"></script>
  *   SharedAds.init();
- *   SharedAds.showInterstitial(() => { /* 跳過後執行 */ });
+ *   SharedAds.showInterstitial(callback);
  * 
  * HTML 要求：
  * 頂部 Banner: <div id="ad-top"></div>

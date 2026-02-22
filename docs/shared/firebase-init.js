@@ -25,8 +25,14 @@ const SharedFirebase = (function () {
             firebase.initializeApp(config);
         }
         db = firebase.firestore();
-        auth = firebase.auth();
-        console.log("[SharedFirebase] Init OK");
+        
+        // Ensure auth component is loaded
+        if (typeof firebase.auth === 'function') {
+            auth = firebase.auth();
+            console.log("[SharedFirebase] Init OK (with Auth)");
+        } else {
+            console.warn("[SharedFirebase] Auth module not detected. Auth features disabled.");
+        }
     } catch (e) {
         console.error("[SharedFirebase] Error:", e.message);
     }
