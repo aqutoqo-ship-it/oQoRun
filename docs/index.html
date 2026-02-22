@@ -277,10 +277,27 @@
             background: var(--accent);
             transform: scale(1.2);
         }
+
+        /* Firebase Debug Overlay */
+        #firebase-debug {
+            display: none;
+            background: rgba(255, 0, 0, 0.9);
+            color: white;
+            padding: 10px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999;
+            font-family: monospace;
+            font-size: 12px;
+            border-bottom: 2px solid darkred;
+        }
     </style>
 </head>
 
 <body>
+    <div id="firebase-debug">⚠️ Firebase Error: <span id="debug-msg">Initializing...</span></div>
 
     <div class="container">
 
@@ -316,7 +333,7 @@
                         <td style="padding: 12px 0; color: #aaa;">First Generation Successfully Running Version</td>
                         <td style="padding: 12px 0; text-align: right; white-space: nowrap;">
                             <!-- Download Button with Counter -->
-                            <a href="oQoRun.zip" id="downloadBtn" download
+                            <a href="./assets/oQoRun.zip" id="downloadBtn" download
                                 style="background: #007acc; color: #fff; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
                                 ⬇ Download <span id="downloadCount"
                                     style="background: rgba(0,0,0,0.2); padding: 1px 6px; border-radius: 8px; font-size: 0.75rem;">0</span>
@@ -356,12 +373,12 @@
             <!-- Image Carousel Section -->
             <div class="carousel-container">
                 <div class="carousel-track" id="carouselTrack">
-                    <div class="carousel-slide"><img src="1.png" alt="oQoRun Preview 1"></div>
-                    <div class="carousel-slide"><img src="2.png" alt="oQoRun Preview 2"></div>
-                    <div class="carousel-slide"><img src="3.png" alt="oQoRun Preview 3"></div>
-                    <div class="carousel-slide"><img src="4.png" alt="oQoRun Preview 4"></div>
-                    <div class="carousel-slide"><img src="5.png" alt="oQoRun Preview 5"></div>
-                    <div class="carousel-slide"><img src="6.png" alt="oQoRun Preview 6"></div>
+                    <div class="carousel-slide"><img src="./assets/1.png" alt="oQoRun Preview 1"></div>
+                    <div class="carousel-slide"><img src="./assets/2.png" alt="oQoRun Preview 2"></div>
+                    <div class="carousel-slide"><img src="./assets/3.png" alt="oQoRun Preview 3"></div>
+                    <div class="carousel-slide"><img src="./assets/4.png" alt="oQoRun Preview 4"></div>
+                    <div class="carousel-slide"><img src="./assets/5.png" alt="oQoRun Preview 5"></div>
+                    <div class="carousel-slide"><img src="./assets/6.png" alt="oQoRun Preview 6"></div>
                 </div>
                 <button class="carousel-btn prev" id="prevBtn">&#10094;</button>
                 <button class="carousel-btn next" id="nextBtn">&#10095;</button>
@@ -668,9 +685,8 @@
             }
 
             function goToSlide(index) {
-                currentIndex = index;
-                if (currentIndex >= slides.length) currentIndex = 0;
-                if (currentIndex < 0) currentIndex = slides.length - 1;
+                const totalSlides = slides.length;
+                currentIndex = (index + totalSlides) % totalSlides; // Handles wrap-around
 
                 track.style.transform = `translateX(-${currentIndex * 100}%)`;
                 updateDots();
@@ -720,28 +736,49 @@
             const downloadBtn = document.getElementById('downloadBtn');
             const downloadCountDisplay = document.getElementById('downloadCount');
 
+            function showDebug(msg) {
+                console.error("[oQoRun Debug]", msg);
+                const debugDiv = document.getElementById('firebase-debug');
+                const debugMsg = document.getElementById('debug-msg');
+                if (debugDiv && debugMsg) {
+                    debugDiv.style.display = 'block';
+                    debugMsg.textContent = msg;
+                }
+            }
+
             // --- Real-time Sync from Firestore ---
             statsRef.onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
                     likeCountDisplay.textContent = data.likes || 0;
                     downloadCountDisplay.textContent = data.downloads || 0;
+                    console.log("[oQoRun] Stats synced:", data);
                 } else {
-                    statsRef.set({ likes: 0, downloads: 0 });
+                    console.warn("[oQoRun] stats document missing. Creating...");
+                    statsRef.set({ likes: 0, downloads: 0 }, { merge: true })
+                        .catch(err => showDebug("Failed to create stats: " + err.message));
                 }
-            }, (error) => console.error("Firestore Snapshot Error:", error));
+            }, (error) => {
+                console.error("Firestore Snapshot Error:", error);
+                if (error.code === 'permission-denied') {
+                    showDebug("Permission Denied. Please ensure you deployed firestore.rules and added aqutoqo-ship-it.github.io to Firebase Authorized Domains.");
+                } else {
+                    showDebug("Sync Error: " + error.message);
+                }
+            });
 
             // --- Like Logic ---
             if (likeBtn) {
                 likeBtn.addEventListener('click', async () => {
                     if (localStorage.getItem('oqorun_voted')) return;
                     try {
-                        await statsRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
+                        await statsRef.set({ likes: firebase.firestore.FieldValue.increment(1) }, { merge: true });
                         localStorage.setItem('oqorun_voted', 'true');
                         likeBtn.style.opacity = '0.7';
                         likeBtn.style.cursor = 'default';
+                        console.log("[oQoRun] Like recorded");
                     } catch (e) {
-                        console.error("Firebase Error:", e);
+                        showDebug("Like failed: " + e.message);
                     }
                     likeBtn.style.transform = 'scale(1.1)';
                     setTimeout(() => likeBtn.style.transform = 'scale(1)', 100);
@@ -759,12 +796,13 @@
                     e.preventDefault();
                     SharedAds.showInterstitial(async () => {
                         try {
-                            await statsRef.update({ downloads: firebase.firestore.FieldValue.increment(1) });
-                            window.location.href = downloadBtn.href;
+                            await statsRef.set({ downloads: firebase.firestore.FieldValue.increment(1) }, { merge: true });
+                            console.log("[oQoRun] Download recorded");
                         } catch (err) {
-                            console.error("Firebase Error:", err);
-                            window.location.href = downloadBtn.href;
+                            showDebug("Download counter failed: " + err.message);
                         }
+                        // Always redirect
+                        window.location.href = downloadBtn.href;
                     }, { message: "✨ Preparing your oQoRun.zip download..." });
 
                     downloadBtn.style.transform = 'scale(1.1)';

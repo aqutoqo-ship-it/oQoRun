@@ -9,6 +9,7 @@
     - 整合了全域的 `shared/` 資源，包括 `firebase-init.js`、`ads.js` 與 `style-base.css`。
     - 使用相對路徑 `./shared/` 以確保在自定義域名（GitHub Pages）環境下的連通性。
 - **數據同步**: 使用 Firebase Firestore (Compat SDK 10.7.1) 進行實時下載量與點贊量統計。
+- **部署平台**: **GitHub Pages** (自動化 CI/CD)。
 - **廣告系統**: 使用 `SharedAds` 模組，在下載前強制插入 5 秒插頁式廣告，實現商業變現。
 
 ## ✨ 主要功能
