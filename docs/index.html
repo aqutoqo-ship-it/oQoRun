@@ -748,6 +748,7 @@
             }
 
             // --- Real-time Sync from Firestore ---
+            let hasShownPermissionError = false;
             statsRef.onSnapshot((doc) => {
                 if (doc.exists) {
                     const data = doc.data();
@@ -755,16 +756,15 @@
                     downloadCountDisplay.textContent = data.downloads || 0;
                     console.log("[oQoRun] Stats synced:", data);
                 } else {
-                    console.warn("[oQoRun] stats document missing. Creating...");
-                    statsRef.set({ likes: 0, downloads: 0 }, { merge: true })
-                        .catch(err => showDebug("Failed to create stats: " + err.message));
+                    console.warn("[oQoRun] stats document missing. (Will be created on first interaction)");
+                    likeCountDisplay.textContent = '0';
+                    downloadCountDisplay.textContent = '0';
                 }
             }, (error) => {
                 console.error("Firestore Snapshot Error:", error);
-                if (error.code === 'permission-denied') {
-                    showDebug("Permission Denied. Please ensure you deployed firestore.rules and added aqutoqo-ship-it.github.io to Firebase Authorized Domains.");
-                } else {
-                    showDebug("Sync Error: " + error.message);
+                if (error.code === 'permission-denied' && !hasShownPermissionError) {
+                    hasShownPermissionError = true;
+                    showDebug("Permission Denied (403). Possible reasons: 1. Rules not published. 2. Domain not authorized in Firebase Console (aqutoqo-ship-it.github.io).");
                 }
             });
 
