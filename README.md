@@ -1,37 +1,38 @@
-# 📦 oQoRun Website — 工具架構與開發紀錄
+# 📦 oQoRun Website — Infrastructure & Development Log
 
-## 📖 工具介紹
-**oQoRun** 是一款專為低配硬件設計的本地 AI 模型啟動器（Launcher）。它提供了 OpenAI 兼容的 API 接口，並支持即時的 UI 代碼預覽功能，讓舊筆記本也能輕鬆變身為 AI Agent 的後端引擎。
+## 📖 Introduction
+**oQoRun** is a local AI model launcher specifically designed for low-end hardware. It provides an OpenAI-compatible API interface and features a live UI code preview, allowing older laptops to serve as powerful backend engines for AI Agents.
 
-## 🏗️ 核心架構
-- **前端技術**: 純 HTML5 + Vanilla CSS + JavaScript (ES6)。
-- **共用模組**: 
-    - 整合了全域的 `shared/` 資源，包括 `firebase-init.js`、`ads.js` 與 `style-base.css`。
-    - 使用相對路徑 `./shared/` 以確保在自定義域名（GitHub Pages）環境下的連通性。
-- **數據同步**: 使用 Firebase Firestore (Compat SDK 10.7.1) 進行實時下載量與點贊量統計。
-- **部署平台**: **GitHub Pages** (自動化 CI/CD)。
-- **廣告系統**: 使用 `SharedAds` 模組，在下載前強制插入 5 秒插頁式廣告，實現商業變現。
+## 🏗️ Core Architecture
+- **Frontend Technology**: Pure HTML5 + Vanilla CSS + JavaScript (ES6).
+- **Shared Modules**: 
+    - Integrates global `shared/` resources, including `firebase-init.js`, `ads.js`, and `style-base.css`.
+    - Uses relative paths (`./shared/`) to ensure reliable connectivity across custom domains (e.g., GitHub Pages).
+- **Data Synchronization**: Real-time Download and Like statistics powered by Firebase Firestore (Compat SDK 10.7.1).
+- **Deployment**: **GitHub Pages** with automated CI/CD.
+- **Monetization**: Utilizes the `SharedAds` module to implement a 5-second mandatory interstitial ad before downloads.
 
-## ✨ 主要功能
-1. **實時計數器**: 自動同步並顯示全網 `Likes` 與 `Downloads` 數據。
-2. **圖片輪播 (Carousel)**: 
-    - 位於頁面中部，展示軟體介面截圖（1.png - 6.png）。
-    - 支援每 5 秒自動播放。
-    - 提供手動左右切換按鈕及導航圓點。
-    - **智能暫停**: 滑鼠懸停時自動停止播放，移開後恢復。
-3. **容錯設計**: 
-    - 腳本採用分離式架構，即使 Firebase 或廣告資源加載失敗，輪播功能依然能正常工作。
-4. **GitHub Pages 優化**: 
-    - 包含 `.nojekyll` 檔案，確保 GitHub 不會過濾 `shared` 等資源文件夾。
+## ✨ Key Features
+1. **Real-time Counters**: Automatically synchronizes and displays global `Likes` and `Downloads` metrics.
+2. **Image Carousel**: 
+    - Located in the center of the page, showcasing software interface screenshots (`1.png` - `6.png`).
+    - Supports 5-second auto-play.
+    - Includes manual navigation arrows and indicator dots.
+    - **Smart Pause**: Auto-pauses on hover and resumes when the mouse leaves.
+3. **Resilient Design**: 
+    - Features a decoupled architecture; the carousel remains functional even if Firebase or ad resources fail to load.
+4. **GitHub Pages Optimization**: 
+    - Includes a `.nojekyll` file to prevent GitHub from filtering essential resource folders like `shared`.
 
-## 🛠️ 開發修復紀錄 (2026-02-22)
-1. **路徑修復**: 
-    - 將 `../shared/` 遷移為 `./shared/` 並物理搬遷目錄，解決了線上自定義域名導致的 404 資源缺失問題。
-2. **連結修復**: 
-    - 修正了 `oQoRun.zip` 的下載路徑。
-    - 驗證並更換了無效的 `Buy me a coffee` 佔位連結。
-3. **功能實現**: 從零開發了響應式的圖片輪播組件。
-4. **部署優化**: 解決了引發 404 的 Jekyll 緩存過濾問題，確保全量部署。
+## 🛠️ Development & Bug Fix Log (2026-02-22)
+1. **Path Correction**: 
+    - Migrated `../shared/` to `./shared/` and reorganized directories to resolve 404 errors on custom domains.
+2. **Link Fixes**: 
+    - Corrected the `oQoRun.zip` download path.
+    - Verified and updated the `Buy me a coffee` donation link.
+3. **New Features**: Developed a responsive image carousel component from scratch.
+4. **Deployment Optimization**: Resolved Jekyll cache filtering issues that caused 404s, ensuring full asset deployment.
+5. **Firebase Stability**: Fixed initialization crashes by adding missing dependencies (`firebase-auth-compat.js`) and resolving `ads.js` syntax errors.
 
 ---
-*本文件由 Antigravity AI 整理，作為 AQutoQo 架構的一部分。*
+*This documentation is maintained by Antigravity AI as part of the AQutoQo architecture.*
