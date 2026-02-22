@@ -5,6 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>oQoRun - The Lightest Local Model Launcher, Live Code Preview</title>
+    <!-- 共用基礎樣式 -->
+    <link href="./shared/style-base.css" rel="stylesheet">
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5510873226977158"
+        crossorigin="anonymous"></script>
     <style>
         :root {
             --bg-color: #121212;
@@ -190,6 +195,88 @@
         .contact-email:hover {
             text-decoration: underline;
         }
+
+        /* Carousel Styles */
+        .carousel-container {
+            position: relative;
+            max-width: 100%;
+            margin: 30px auto;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            background: #000;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+            align-items: center;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .carousel-slide img {
+            max-width: 100%;
+            display: block;
+            border-radius: 4px;
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 15px 10px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            z-index: 10;
+            transition: background 0.3s;
+            border-radius: 4px;
+        }
+
+        .carousel-btn:hover {
+            background: rgba(0, 122, 204, 0.8);
+        }
+
+        .carousel-btn.prev {
+            left: 10px;
+        }
+
+        .carousel-btn.next {
+            right: 10px;
+        }
+
+        .carousel-dots {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .dot.active {
+            background: var(--accent);
+            transform: scale(1.2);
+        }
     </style>
 </head>
 
@@ -229,7 +316,7 @@
                         <td style="padding: 12px 0; color: #aaa;">First Generation Successfully Running Version</td>
                         <td style="padding: 12px 0; text-align: right; white-space: nowrap;">
                             <!-- Download Button with Counter -->
-                            <a href="../oQoRun/oQoRun.zip" id="downloadBtn" download
+                            <a href="oQoRun.zip" id="downloadBtn" download
                                 style="background: #007acc; color: #fff; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 6px;">
                                 ⬇ Download <span id="downloadCount"
                                     style="background: rgba(0,0,0,0.2); padding: 1px 6px; border-radius: 8px; font-size: 0.75rem;">0</span>
@@ -249,14 +336,37 @@
             <!-- Interaction Buttons Section -->
             <div style="margin-top: 25px; display: flex; justify-content: center; gap: 15px; align-items: center;">
                 <!-- Buy Me A Coffee Button -->
-                <a href="#"
+                <!-- 請在此處替換 href="#" 為你的實際咖啡鏈結，例如：https://www.buymeacoffee.com/yourname -->
+                <a href="https://www.buymeacoffee.com/aqutoqo"
                     style="background: #6F4E37; color: #fff; padding: 10px 24px; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; transition: transform 0.2s;">
                     ☕ <span>Buy me a coffee</span>
                 </a>
             </div>
 
+            <!-- Google AdSense 預留位置 -->
+            <!-- 如果你以後有廣告代碼，可以貼在下面這區塊 -->
+            <div
+                style="margin-top: 20px; min-height: 90px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #444; font-size: 0.8rem;">
+                Ads Placeholder (Paste AdSense Code Here)
+            </div>
+
             <p style="font-size: 0.85rem; color: #666; margin-top: 15px;">* MacOS / Linux users can use this by
                 downloading native Llama.cpp binaries and running <code>node server.js</code>.</p>
+
+            <!-- Image Carousel Section -->
+            <div class="carousel-container">
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="carousel-slide"><img src="1.png" alt="oQoRun Preview 1"></div>
+                    <div class="carousel-slide"><img src="2.png" alt="oQoRun Preview 2"></div>
+                    <div class="carousel-slide"><img src="3.png" alt="oQoRun Preview 3"></div>
+                    <div class="carousel-slide"><img src="4.png" alt="oQoRun Preview 4"></div>
+                    <div class="carousel-slide"><img src="5.png" alt="oQoRun Preview 5"></div>
+                    <div class="carousel-slide"><img src="6.png" alt="oQoRun Preview 6"></div>
+                </div>
+                <button class="carousel-btn prev" id="prevBtn">&#10094;</button>
+                <button class="carousel-btn next" id="nextBtn">&#10095;</button>
+                <div class="carousel-dots" id="carouselDots"></div>
+            </div>
         </div>
 
 
@@ -518,42 +628,150 @@
 
     </div>
 
+    <!-- Firebase SDK (compat version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Shared Firebase & Ads -->
+    <script src="./shared/firebase-init.js"></script>
+    <script src="./shared/ads.js"></script>
+
     <script>
-        // --- Like Counter Logic ---
-        const likeBtn = document.getElementById('likeBtn');
-        const likeCountDisplay = document.getElementById('likeCount');
+        // --- Carousel Logic (Runs first, independent of Firebase) ---
+        (function () {
+            const track = document.getElementById('carouselTrack');
+            if (!track) return;
 
-        let likeCount = parseInt(localStorage.getItem('oqorun_likes') || '0');
-        likeCountDisplay.textContent = likeCount;
+            const slides = Array.from(track.children);
+            const nextBtn = document.getElementById('nextBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            const dotsContainer = document.getElementById('carouselDots');
 
-        likeBtn.addEventListener('click', () => {
-            likeCount++;
-            localStorage.setItem('oqorun_likes', likeCount);
-            likeCountDisplay.textContent = likeCount;
+            let currentIndex = 0;
+            let autoPlayTimer;
 
-            likeBtn.style.transform = 'scale(1.05)';
-            setTimeout(() => {
-                likeBtn.style.transform = 'scale(1)';
-            }, 100);
-        });
+            // Create dots
+            slides.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (index === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => goToSlide(index));
+                dotsContainer.appendChild(dot);
+            });
 
-        // --- Download Counter Logic ---
-        const downloadBtn = document.getElementById('downloadBtn');
-        const downloadCountDisplay = document.getElementById('downloadCount');
+            const dots = Array.from(dotsContainer.children);
 
-        let downloadCount = parseInt(localStorage.getItem('oqorun_downloads') || '0');
-        downloadCountDisplay.textContent = downloadCount;
+            function updateDots() {
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex);
+                });
+            }
 
-        downloadBtn.addEventListener('click', () => {
-            downloadCount++;
-            localStorage.setItem('oqorun_downloads', downloadCount);
-            downloadCountDisplay.textContent = downloadCount;
+            function goToSlide(index) {
+                currentIndex = index;
+                if (currentIndex >= slides.length) currentIndex = 0;
+                if (currentIndex < 0) currentIndex = slides.length - 1;
 
-            downloadBtn.style.transform = 'scale(1.05)';
-            setTimeout(() => {
-                downloadBtn.style.transform = 'scale(1)';
-            }, 100);
-        });
+                track.style.transform = `translateX(-${currentIndex * 100}%)`;
+                updateDots();
+                resetAutoPlay();
+            }
+
+            function nextSlide() { goToSlide(currentIndex + 1); }
+            function prevSlide() { goToSlide(currentIndex - 1); }
+
+            if (nextBtn) nextBtn.addEventListener('click', nextSlide);
+            if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+
+            function startAutoPlay() {
+                autoPlayTimer = setInterval(nextSlide, 5000);
+            }
+
+            function resetAutoPlay() {
+                clearInterval(autoPlayTimer);
+                startAutoPlay();
+            }
+
+            startAutoPlay();
+
+            // Pause on hover
+            const carousel = document.querySelector('.carousel-container');
+            if (carousel) {
+                carousel.addEventListener('mouseenter', () => clearInterval(autoPlayTimer));
+                carousel.addEventListener('mouseleave', startAutoPlay);
+            }
+        })();
+
+        // --- Firebase & Ads Logic (Error-resilient) ---
+        (function () {
+            if (typeof SharedFirebase === 'undefined' || typeof SharedAds === 'undefined') {
+                console.warn("[oQoRun] Shared resources not loaded. Firebase/Ads disabled.");
+                return;
+            }
+
+            const { db } = SharedFirebase;
+            const statsRef = db.collection('oQoRun_stats').doc('counters');
+
+            // 初始化廣告系統
+            SharedAds.init();
+
+            const likeBtn = document.getElementById('likeBtn');
+            const likeCountDisplay = document.getElementById('likeCount');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const downloadCountDisplay = document.getElementById('downloadCount');
+
+            // --- Real-time Sync from Firestore ---
+            statsRef.onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    likeCountDisplay.textContent = data.likes || 0;
+                    downloadCountDisplay.textContent = data.downloads || 0;
+                } else {
+                    statsRef.set({ likes: 0, downloads: 0 });
+                }
+            }, (error) => console.error("Firestore Snapshot Error:", error));
+
+            // --- Like Logic ---
+            if (likeBtn) {
+                likeBtn.addEventListener('click', async () => {
+                    if (localStorage.getItem('oqorun_voted')) return;
+                    try {
+                        await statsRef.update({ likes: firebase.firestore.FieldValue.increment(1) });
+                        localStorage.setItem('oqorun_voted', 'true');
+                        likeBtn.style.opacity = '0.7';
+                        likeBtn.style.cursor = 'default';
+                    } catch (e) {
+                        console.error("Firebase Error:", e);
+                    }
+                    likeBtn.style.transform = 'scale(1.1)';
+                    setTimeout(() => likeBtn.style.transform = 'scale(1)', 100);
+                });
+
+                if (localStorage.getItem('oqorun_voted')) {
+                    likeBtn.style.opacity = '0.7';
+                    likeBtn.style.cursor = 'default';
+                }
+            }
+
+            // --- Download Logic ---
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    SharedAds.showInterstitial(async () => {
+                        try {
+                            await statsRef.update({ downloads: firebase.firestore.FieldValue.increment(1) });
+                            window.location.href = downloadBtn.href;
+                        } catch (err) {
+                            console.error("Firebase Error:", err);
+                            window.location.href = downloadBtn.href;
+                        }
+                    }, { message: "✨ Preparing your oQoRun.zip download..." });
+
+                    downloadBtn.style.transform = 'scale(1.1)';
+                    setTimeout(() => downloadBtn.style.transform = 'scale(1)', 100);
+                });
+            }
+        })();
     </script>
 </body>
 
