@@ -32,7 +32,12 @@ const SharedAds = (function () {
         overlay.className = 'interstitial-overlay';
         overlay.innerHTML = `
             <p style="color:#ffd700; margin-bottom:15px; font-size:1.1rem;">✨ Preparing...</p>
-            <div class="interstitial-ad-box">ADVERTISEMENT — Interstitial</div>
+            <div class="interstitial-ad-box">
+                <ins class="adsbygoogle" style="display:block;width:100%;height:70vh"
+                    data-ad-client="ca-pub-5510873226977158" data-ad-slot="7052338247"
+                    data-ad-format="auto" data-full-width-responsive="true"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+            </div>
             <button id="sharedInterstitialSkipBtn" class="interstitial-skip" disabled>Skip in 5s</button>
         `;
         document.body.appendChild(overlay);
